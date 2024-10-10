@@ -2,15 +2,16 @@ import os
 import datetime
 import requests
 from dotenv import load_dotenv
-from base_classes import AbstractParser, IDsManagerMixin
+from base_classes import AbstractParser
 
 load_dotenv('../.env')
-token = os.getenv('VK_API_TOKEN')
+TOKEN = os.getenv('VK_API_TOKEN')
 
 
-class VKParser(AbstractParser, IDsManagerMixin):
-    # MAX_POSTS = 100
-    # NEW_POSTS_TIME = datetime.timedelta(hours=1)
+# TODO: Create in VKParser method that extracts all valuable data from output posts for the final response
+class VKParser(AbstractParser):
+    MAX_POSTS = 100  # maximum number of posts in one response provided by VK API
+    NEW_POSTS_TIME = datetime.timedelta(hours=1)
 
     def __init__(self, owner_id=None, domain=None) -> None:
         super().__init__()
@@ -23,29 +24,34 @@ class VKParser(AbstractParser, IDsManagerMixin):
 
         if owner_id:
             self.url = (f"https://api.vk.com/method/wall.get?owner_id={owner_id}"
-                        f"&count={self.MAX_IDS_COUNT}&lang=ru&v=5.199")
+                        f"&count={self.MAX_POSTS}&lang=ru&v=5.199")
         else:
             self.url = (f"https://api.vk.com/method/wall.get?domain={domain}"
-                        f"&count={self.MAX_IDS_COUNT}&lang=ru&v=5.199")
+                        f"&count={self.MAX_POSTS}&lang=ru&v=5.199")
 
     def parse(self) -> list[dict]:
-        response = requests.post(self.url, headers={'Authorization': 'Bearer ' + token}).json()
-        posts_ids = (post['id'] for post in response['response']['items'])
+        """
+        Parse posts from the page determined by `self.url`. self.MAX_POSTS posts will be returned.
+        :return: List of posts parsed from the page.
+        """
+        response = requests.post(self.url, headers={'Authorization': 'Bearer ' + TOKEN}).json()
+        posts = [post for post in response['response']['items']]
 
-        self.update_ids(*posts_ids)
-        return [post for post in response['response']['items']]
+        return posts
 
     def parse_new(self) -> list[dict]:
-        previous_ids = self.previous_ids.copy()
-
+        """
+        Parse posts as well as self.parse().
+        Only posts that appeared within self.NEW_POSTS_TIME before the method call will be returned.
+        :return: Filtered list of posts parsed from the page.
+        """
         posts = self.parse()
-        posts_ids = [p['id'] for p in posts]
-        new_posts_ids = self.get_new_ids(*posts_ids, previous_ids=previous_ids)
+        since_datetime = datetime.datetime.now() - self.NEW_POSTS_TIME
+        new_posts = [p for p in posts if p['date'] >= since_datetime.timestamp()]
 
-        posts = [p for p in posts if p['id'] in new_posts_ids]
-        return posts
+        return new_posts
 
 
 if __name__ == '__main__':  # DEBUG! Don't forget to remove!
     parser = VKParser(domain='bmstu_snto')
-    print(len(parser.parse_new()))
+    print(parser.parse_new())

@@ -23,26 +23,6 @@ class AsyncAbstractParser(metaclass=ABCMeta):
         pass
 
 
-class IDsManagerMixin:
-    def __init__(self) -> None:
-        self.MAX_IDS_COUNT = 100  # default value
-        self.previous_ids = []
-
-    def update_ids(self, *ids: list) -> None:
-        new_ids = self.get_new_ids(*ids)
-        self.previous_ids.extend(new_ids)
-
-        if len(self.previous_ids) > self.MAX_IDS_COUNT:
-            self.previous_ids = self.previous_ids[-self.MAX_IDS_COUNT:]
-
-    def get_new_ids(self, *ids: list, previous_ids=None) -> set:
-        if previous_ids is None:
-            previous_ids = self.previous_ids
-
-        new_ids = set(ids) - set(previous_ids)
-        return new_ids
-
-
 class ParserList:
     def __init__(self, *items: Union[AbstractParser, AsyncAbstractParser, "ParserList"],
                  mode: Literal['new'] | Literal['union'] = 'new'):
@@ -73,16 +53,26 @@ class ParserList:
         for p in parsers:
             if isinstance(p, AsyncAbstractParser):
                 self.async_parsers.append(p)
-            else:
+            elif isinstance(p, AbstractParser):
                 self.sync_parsers.append(p)
+            else:
+                raise ValueError(f'parser base type {type(p)} not supported')
 
     def parse(self) -> list[Any]:
+        """
+        Use the parse() method from all parsers.
+        :return: One-dimensional list of parsed posts
+        """
         async_tasks = [p.parse for p in self.async_parsers]
         sync_tasks = [p.parse for p in self.sync_parsers]
 
         return asyncio.run(self._run_tasks_async(async_tasks, sync_tasks))
 
     def parse_new(self) -> list[Any]:
+        """
+        Use the parse_new() method from all parsers.
+        :return: One-dimensional list of parsed posts
+        """
         async_tasks = [p.parse_new for p in self.async_parsers]
         sync_tasks = [p.parse_new for p in self.sync_parsers]
 
@@ -108,5 +98,3 @@ class ParserList:
 
     async def _wrap_sync(self, func):
         return func()
-
-
