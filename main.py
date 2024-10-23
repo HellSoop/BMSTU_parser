@@ -1,1 +1,30 @@
+import os
+import asyncio
+from traceback import print_exception
+from dotenv import load_dotenv
+from aiogram import Bot, Dispatcher
 
+from bot.handlers.menu_handlers import menu_router
+
+load_dotenv('.env')
+TOKEN = os.getenv('BOT_TOKEN')
+
+bot = Bot(token=TOKEN)
+dp = Dispatcher()
+
+dp.include_routers(
+    menu_router,
+)
+
+
+async def main():
+    try:
+        await dp.start_polling(bot)
+    except Exception as e:
+        print_exception(e)
+
+
+if __name__ == '__main__':
+    print('Bot started')
+    while True:
+        asyncio.run(main())

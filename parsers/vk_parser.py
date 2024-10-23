@@ -54,4 +54,4 @@ class VKParser(AbstractParser):
 
 if __name__ == '__main__':  # DEBUG! Don't forget to remove!
     parser = VKParser(domain='bmstu_snto')
-    print(parser.parse_new())
+    print(parser.parse()[0])

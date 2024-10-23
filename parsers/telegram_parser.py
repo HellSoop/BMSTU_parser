@@ -6,8 +6,8 @@ from dotenv import load_dotenv
 from base_classes import AsyncAbstractParser
 
 load_dotenv('../.env')
-TG_API_ID = os.getenv('TG_API_ID')
-TG_API_HASH = os.getenv('TG_API_HASH')
+TG_API_ID = os.getenv('TG_USER_API_ID')
+TG_API_HASH = os.getenv('TG_USER_API_HASH')
 
 
 # TODO: Create in TGParser method that extracts all valuable data from output posts for the final response
@@ -47,9 +47,9 @@ class TGParser(AsyncAbstractParser):
 
 if __name__ == '__main__':  # DEBUG! Don't forget to remove!
     async def main():
-        posts = await parser.parse_new()
-        for p in posts:
-            print(p.edit_date, p.caption, '-' * 100, '\n', sep='\n')
+        photo_id = (await parser.parse())[0].photo
+        print(photo_id)
 
-    parser = TGParser(channel='studsovet_bmstu')
+
+    parser = TGParser(channel='b2b_bmstu')
     asyncio.run(main())
