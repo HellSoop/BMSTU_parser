@@ -10,6 +10,7 @@ TOKEN = os.getenv('VK_API_TOKEN')
 
 # TODO: Create in VKParser method that extracts all valuable data from output posts for the final response
 class VKParser(AbstractParser):
+    """Parses content from the VK group specified at creation"""
     MAX_POSTS = 100  # maximum number of posts in one response provided by VK API
     NEW_POSTS_TIME = datetime.timedelta(hours=1)
 

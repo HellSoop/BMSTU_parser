@@ -3,23 +3,43 @@ from abc import ABCMeta, abstractmethod
 from typing import Literal, Union, Any, Iterable, Callable
 
 
+class PostAttachment:
+    def __init__(self, content_type: Literal['photo', 'video', 'audio'], content: str):
+        self.content_type = content_type
+        self.content = content
+
+
+class ParserPost:
+    def __init__(self, text: str, channel: str, date, attachments: list[PostAttachment] = None):
+        self.text = text
+        self.channel = channel
+        self.date = date
+        if attachments is None:
+            self.attachments = []
+        else:
+            self.attachments = attachments
+
+    def __repr__(self):
+        return f'<ParserPost(text="{self.text}", {len(self.attachments)} attachments)>'
+
+
 class AbstractParser(metaclass=ABCMeta):
     @abstractmethod
-    def parse(self):
+    def parse(self) -> list[ParserPost]:
         pass
 
     @abstractmethod
-    def parse_new(self):
+    def parse_new(self) -> list[ParserPost]:
         pass
 
 
 class AsyncAbstractParser(metaclass=ABCMeta):
     @abstractmethod
-    async def parse(self):
+    async def parse(self) -> list[ParserPost]:
         pass
 
     @abstractmethod
-    async def parse_new(self):
+    async def parse_new(self) -> list[ParserPost]:
         pass
 
 
