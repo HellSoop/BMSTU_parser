@@ -1,9 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from .models.attachments import Attachment
 from .models.channels import Channel
-from .models.content_types import ContentType
 from .models.posts import Post
 from .models.users import User
 

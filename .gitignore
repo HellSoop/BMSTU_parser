@@ -1,7 +1,8 @@
 .venv/
+venv/
 .env
 .idea/
-*/__pycache__/
+__pycache__/
 */user_account.session
 */bot.session
 */sources.txt
