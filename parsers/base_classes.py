@@ -1,26 +1,23 @@
 import asyncio
 from abc import ABCMeta, abstractmethod
 from typing import Literal, Union, Any, Iterable, Callable
-
-
-class PostAttachment:
-    def __init__(self, content_type: Literal['photo', 'video', 'audio'], content: str):
-        self.content_type = content_type
-        self.content = content
+from datetime import datetime
 
 
 class ParserPost:
-    def __init__(self, text: str, channel: str, date, attachments: list[PostAttachment] = None):
+    def __init__(self, text: str, url: str, channel: str, date: datetime):
         self.text = text
+        self.url = url
+        # TODO: create dict with channels ids
         self.channel = channel
         self.date = date
-        if attachments is None:
-            self.attachments = []
-        else:
-            self.attachments = attachments
 
     def __repr__(self):
-        return f'<ParserPost(text="{self.text}", {len(self.attachments)} attachments)>'
+        return f'<ParserPost(url="{self.url}", text="{self.text[:30]}...")>'
+
+    # TODO: implement get_model_instance method
+    def get_model_instance(self):
+        ...
 
 
 class AbstractParser(metaclass=ABCMeta):
@@ -78,7 +75,7 @@ class ParserList:
             else:
                 raise ValueError(f'parser base type {type(p)} not supported')
 
-    def parse(self) -> list[Any]:
+    def parse(self) -> list[ParserPost]:
         """
         Use the parse() method from all parsers.
         :return: One-dimensional list of parsed posts
@@ -88,7 +85,7 @@ class ParserList:
 
         return asyncio.run(self._run_tasks_async(async_tasks, sync_tasks))
 
-    def parse_new(self) -> list[Any]:
+    def parse_new(self) -> list[ParserPost]:
         """
         Use the parse_new() method from all parsers.
         :return: One-dimensional list of parsed posts
