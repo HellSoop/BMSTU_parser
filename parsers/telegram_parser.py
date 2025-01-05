@@ -5,13 +5,17 @@ from pyrogram.types import Message
 from base_classes import AsyncAbstractParser, ParserPost
 
 
-class TGParser(AsyncAbstractParser):
+class TelegramParser(AsyncAbstractParser):
     """Parses content from the Telegram channel specified in the channel parameter"""
     MAX_POSTS = 60  # I suppose that fewer than 60 posts appear in the channel per hour
     NEW_POSTS_TIME = datetime.timedelta(hours=1)
 
-    def __init__(self, channel):
-        super().__init__()
+    def __init__(self, channel_id: int, channel: str):
+        """
+        :param channel_id: channel ID in database
+        :param channel: username or identifier of target chat
+        """
+        super().__init__(channel_id)
         self.channel = channel
 
     async def parse(self) -> list[ParserPost]:
@@ -22,7 +26,7 @@ class TGParser(AsyncAbstractParser):
         async with Client("user_account") as user_client:
             posts = [post async for post in user_client.get_chat_history(self.channel, limit=self.MAX_POSTS)]
 
-            return self.process_posts(posts)
+        return self.process_posts(posts)
 
     async def parse_new(self) -> list[ParserPost]:
         """
@@ -36,7 +40,7 @@ class TGParser(AsyncAbstractParser):
             posts = [post async for post in user_client.get_chat_history(self.channel, limit=self.MAX_POSTS)
                      if post.date >= since_datetime]
 
-            return self.process_posts(posts)
+        return self.process_posts(posts)
 
     def process_posts(self, posts: list[Message]) -> list[ParserPost]:
         """
@@ -48,7 +52,13 @@ class TGParser(AsyncAbstractParser):
         for p in posts:
             if p.text or p.caption:
                 text = p.text if p.text else p.caption
-                res.append(ParserPost(text, p.link, self.channel, p.date))
+
+                res.append(ParserPost(
+                    text=text,
+                    url=p.link,
+                    channel_id=self.channel_id,
+                    date=p.date
+                ))
 
         return res
 
@@ -59,5 +69,5 @@ if __name__ == '__main__':  # DEBUG! Don't forget to remove!
         print(posts)
 
 
-    parser = TGParser(channel='python2day')  # 'b2b_bmstu'
+    parser = TelegramParser(1, channel='python2day')  # 'b2b_bmstu'
     asyncio.run(main())

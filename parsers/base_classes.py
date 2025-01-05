@@ -5,11 +5,10 @@ from datetime import datetime
 
 
 class ParserPost:
-    def __init__(self, text: str, url: str, channel: str, date: datetime):
+    def __init__(self, text: str, url: str, channel_id: int, date: datetime):
         self.text = text
         self.url = url
-        # TODO: create dict with channels ids
-        self.channel = channel
+        self.channel_id = channel_id
         self.date = date
 
     def __repr__(self):
@@ -21,6 +20,9 @@ class ParserPost:
 
 
 class AbstractParser(metaclass=ABCMeta):
+    def __init__(self, channel_id: int):
+        self.channel_id = channel_id
+
     @abstractmethod
     def parse(self) -> list[ParserPost]:
         pass
@@ -31,6 +33,9 @@ class AbstractParser(metaclass=ABCMeta):
 
 
 class AsyncAbstractParser(metaclass=ABCMeta):
+    def __init__(self, channel_id: int):
+        self.channel_id = channel_id
+
     @abstractmethod
     async def parse(self) -> list[ParserPost]:
         pass

@@ -1,6 +1,6 @@
 from base_classes import ParserList
 from vk_parser import VKParser
-from telegram_parser import TGParser
+from telegram_parser import TelegramParser
 
 VKParserList = ParserList(
     VKParser(domain='bmstu_snto'),
