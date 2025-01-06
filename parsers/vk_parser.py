@@ -74,4 +74,4 @@ if __name__ == '__main__':  # DEBUG! Don't forget to remove!
     TOKEN = os.getenv('VK_API_TOKEN')
 
     parser = VKParser(1, domain='bmstu_snto')
-    print(parser.parse_new())
+    print([p.get_model_instance() for p in parser.parse_new()])

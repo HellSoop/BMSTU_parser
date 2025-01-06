@@ -2,25 +2,47 @@ import asyncio
 from abc import ABCMeta, abstractmethod
 from typing import Literal, Union, Any, Iterable, Callable
 from datetime import datetime
+from database import Post
 
 
 class ParserPost:
+    """
+    Parser (inherited from AbstractParser or AsyncAbstractParser classes) response object.
+    """
     def __init__(self, text: str, url: str, channel_id: int, date: datetime):
+        """
+        :param text: post text
+        :param url: hyperlink to the post itself
+        :param channel_id: channel ID in database
+        :param date: post publication date
+        """
         self.text = text
         self.url = url
         self.channel_id = channel_id
         self.date = date
 
-    def __repr__(self):
-        return f'<ParserPost(url="{self.url}", text="{self.text[:30]}...")>'
+    def get_model_instance(self) -> Post:
+        """
+        Creates Post model object with information from this ParserPost object.
+        :return: Post model object
+        """
+        return Post(url=self.url, channel_id=self.channel_id, date=self.date)
 
-    # TODO: implement get_model_instance method
-    def get_model_instance(self):
-        ...
+    def __repr__(self):
+        return f'<ParserPost(url="{self.url}", channel_id={self.channel_id}, text="{self.text[:30]}...")>'
 
 
 class AbstractParser(metaclass=ABCMeta):
+    """
+    Abstract superclass for all sync parsers. Assumes parsing of the channel specified on the object creation.
+    **parse** method returns several posts from the channel, the number may be different for each subclass.
+    **parse_new** method returns posts that appeared in the channel in the last hour.
+    """
     def __init__(self, channel_id: int):
+        """
+        :param channel_id: channel ID in database.
+        This is necessary to match records in the 'channels' table in database and parser objects.
+        """
         self.channel_id = channel_id
 
     @abstractmethod
@@ -33,7 +55,16 @@ class AbstractParser(metaclass=ABCMeta):
 
 
 class AsyncAbstractParser(metaclass=ABCMeta):
+    """
+    Abstract superclass for all async parsers. Assumes parsing of the channel specified on the object creation.
+    **parse** method returns several posts from the channel, the number may be different for each subclass.
+    **parse_new** method returns posts that appeared in the channel in the last hour.
+    """
     def __init__(self, channel_id: int):
+        """
+        :param channel_id: channel ID in database.
+        This is necessary to match records in the 'channels' table in database and parser objects.
+        """
         self.channel_id = channel_id
 
     @abstractmethod
@@ -46,8 +77,16 @@ class AsyncAbstractParser(metaclass=ABCMeta):
 
 
 class ParserList:
+    """
+    Object that contains several parsers and simplifies working with them
+    """
     def __init__(self, *items: Union[AbstractParser, AsyncAbstractParser, "ParserList"],
                  mode: Literal['new'] | Literal['union'] = 'new'):
+        """
+        Creates the ParserList object depending on the selected mode
+        :param items: parsers (sync and async) or ParserList's depending on the mode
+        :param mode: 'new' to create the ParserList object from scratch or 'union' to merge multiple ParserList's
+        """
         match mode:
             case 'new':
                 parsers = items
