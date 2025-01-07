@@ -61,13 +61,3 @@ class TelegramParser(AsyncAbstractParser):
                 ))
 
         return res
-
-
-if __name__ == '__main__':  # DEBUG! Don't forget to remove!
-    async def main():
-        posts = await parser.parse_new()
-        print(posts)
-
-
-    parser = TelegramParser(1, channel='python2day')  # 'b2b_bmstu'
-    asyncio.run(main())

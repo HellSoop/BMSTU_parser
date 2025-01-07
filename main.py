@@ -4,6 +4,7 @@ from traceback import print_exception
 from dotenv import load_dotenv
 from aiogram import Bot, Dispatcher
 
+from bot.periodic_parsing import periodic_parsing_scheduler
 from bot.handlers.menu_handlers import menu_router
 
 load_dotenv('.env')
@@ -19,6 +20,7 @@ dp.include_routers(
 
 async def main():
     try:
+        periodic_parsing_scheduler.start()
         await dp.start_polling(bot)
     except Exception as e:
         print_exception(e)

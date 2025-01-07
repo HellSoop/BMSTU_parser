@@ -66,12 +66,3 @@ class VKParser(AbstractParser):
             channel_id=self.channel_id,
             date=datetime.datetime.fromtimestamp(p['date'])
         ) for p in posts if p['text']]
-
-
-if __name__ == '__main__':  # DEBUG! Don't forget to remove!
-    from dotenv import load_dotenv
-    load_dotenv('../.env')
-    TOKEN = os.getenv('VK_API_TOKEN')
-
-    parser = VKParser(1, domain='bmstu_snto')
-    print([p.get_model_instance() for p in parser.parse_new()])
