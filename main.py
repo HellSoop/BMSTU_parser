@@ -1,16 +1,13 @@
-import os
+from dotenv import load_dotenv
+load_dotenv('.env')  # it's very important because there is some os.getenv calls in packages
+
 import asyncio
 from traceback import print_exception
-from dotenv import load_dotenv
-from aiogram import Bot, Dispatcher
-
+from aiogram import Dispatcher
 from periodic_parsing.scheduler import periodic_parsing_scheduler
+from bot.bot import bot
 from bot.handlers.menu_handlers import menu_router
 
-load_dotenv('.env')
-TOKEN = os.getenv('BOT_TOKEN')
-
-bot = Bot(token=TOKEN)
 dp = Dispatcher()
 
 dp.include_routers(

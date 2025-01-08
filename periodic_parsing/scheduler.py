@@ -11,4 +11,4 @@ executors = {
 }
 periodic_parsing_scheduler = AsyncIOScheduler(executors=executors, timezone=tz)
 
-periodic_parsing_scheduler.add_job(do_periodic_parsing, trigger='cron', second='*/5')
+periodic_parsing_scheduler.add_job(do_periodic_parsing, trigger='cron', minute='*/1')
