@@ -3,7 +3,7 @@ venv/
 .env
 .idea/
 __pycache__/
-*/user_account.session
+user_account.session
 */bot.session
 */sources.txt
 */bot.db

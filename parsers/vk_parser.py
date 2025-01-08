@@ -1,7 +1,7 @@
 import os
 import datetime
 import requests
-from base_classes import AbstractParser, ParserPost
+from parsers.base_classes import AbstractParser, ParserPost
 
 TOKEN = os.getenv('VK_API_TOKEN')
 

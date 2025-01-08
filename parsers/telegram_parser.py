@@ -1,8 +1,7 @@
 import datetime
-import asyncio
 from pyrogram import Client
 from pyrogram.types import Message
-from base_classes import AsyncAbstractParser, ParserPost
+from parsers.base_classes import AsyncAbstractParser, ParserPost
 
 
 class TelegramParser(AsyncAbstractParser):
