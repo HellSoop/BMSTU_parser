@@ -36,7 +36,7 @@ class AbstractParser(metaclass=ABCMeta):
     """
     Abstract superclass for all sync parsers. Assumes parsing of the channel specified on the object creation.
     **parse** method returns several posts from the channel, the number may be different for each subclass.
-    **parse_new** method returns posts that appeared in the channel in the last hour.
+    **parse_new** method returns posts that appeared in the channel in the last hour. There may be some small overlap.
     """
     def __init__(self, channel_id: int):
         """
@@ -58,7 +58,7 @@ class AsyncAbstractParser(metaclass=ABCMeta):
     """
     Abstract superclass for all async parsers. Assumes parsing of the channel specified on the object creation.
     **parse** method returns several posts from the channel, the number may be different for each subclass.
-    **parse_new** method returns posts that appeared in the channel in the last hour.
+    **parse_new** method returns posts that appeared in the channel in the last hour. There may be some small overlap.
     """
     def __init__(self, channel_id: int):
         """

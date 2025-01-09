@@ -7,7 +7,8 @@ from parsers.base_classes import AsyncAbstractParser, ParserPost
 class TelegramParser(AsyncAbstractParser):
     """Parses content from the Telegram channel specified in the channel parameter"""
     MAX_POSTS = 60  # I suppose that fewer than 60 posts appear in the channel per hour
-    NEW_POSTS_TIME = datetime.timedelta(hours=1)
+    # There is a planned overlap in case of a scheduler misfire
+    NEW_POSTS_TIME = datetime.timedelta(hours=1, seconds=15)
 
     def __init__(self, channel_id: int, channel: str):
         """

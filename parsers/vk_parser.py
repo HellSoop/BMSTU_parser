@@ -9,7 +9,8 @@ TOKEN = os.getenv('VK_API_TOKEN')
 class VKParser(AbstractParser):
     """Parses content from the VK group specified at creation"""
     MAX_POSTS = 100  # maximum number of posts in one response provided by VK API
-    NEW_POSTS_TIME = datetime.timedelta(hours=1)
+    # There is a planned overlap in case of a scheduler misfire
+    NEW_POSTS_TIME = datetime.timedelta(hours=1, seconds=15)
 
     def __init__(self, channel_id: int, owner_id: str | int | None = None, domain: str | None = None) -> None:
         """
