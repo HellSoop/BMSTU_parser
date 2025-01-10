@@ -1,40 +1,4 @@
 from parsers.base_classes import ParserList
 from parsers.vk_parser import VKParser
 from parsers.telegram_parser import TelegramParser
-
-FullParserList = ParserList(
-    VKParser(1, domain='bmstu_snto'),
-    VKParser(2, domain='ysc_bmstu_sm'),
-    VKParser(3, domain='artclub.bmstu'),
-    VKParser(4, domain='club5248660'),
-    VKParser(5, domain='profkom_bmstu'),
-    VKParser(6, domain='analog24x36'),
-    VKParser(7, domain='bmstu1830'),
-    VKParser(8, domain='bmstu_career'),
-    VKParser(9, domain='creative_center_bmstu'),
-    VKParser(10, domain='creative_center_bmstu'),
-    VKParser(11, domain='ssc_bmstu'),
-    VKParser(12, domain='alp.bmstu'),
-    VKParser(13, domain='theatregolos'),
-    VKParser(14, domain='pmvoices'),
-    VKParser(15, domain='art_club_production'),
-    VKParser(16, domain='legionbmstu'),
-    VKParser(17, domain='alexshowballet'),
-    VKParser(18, domain='pmvoices'),
-    VKParser(19, domain='neapolmisailov'),
-    VKParser(20, domain='do_bmstu_ru'),
-    VKParser(21, domain='engineers2030bmstu'),
-    VKParser(22, domain='mic.bmstu'),
-    VKParser(23, domain='club224526757'),
-    VKParser(24, domain='robotics_bmstu'),
-    VKParser(25, domain='hc_bmstu'),
-    VKParser(26, domain='bmstubasket'),
-    VKParser(27, domain='bmstubasket'),
-    VKParser(28, domain='bmstu_ultras'),
-    VKParser(29, domain='ifl_bmstu'),
-    VKParser(30, domain='bas.bmstu'),
-    VKParser(31, domain='brt_fs'),
-    VKParser(32, domain='vcbmstu'),
-    VKParser(33, domain='baumankan'),
-    VKParser(34, domain='wwbmstu'),
-)
+from parsers.channels import full_parser_list

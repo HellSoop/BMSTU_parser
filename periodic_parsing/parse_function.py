@@ -1,11 +1,10 @@
 import asyncio
 from bot.bot import bot
 from database import session, User, Channel, Post
-from parsers import FullParserList
+from parsers import full_parser_list
 from parsers.base_classes import ParserPost
 
 # temporary
-import pickle as pkl
 get_important_posts = lambda x: x  # mock function, it will be implemented in model package
 
 
@@ -36,9 +35,7 @@ async def run_tasks(tasks):
 def do_periodic_parsing():
     global previous_post_urls
 
-    # posts = FullParserList.parse_new()
-    with open('posts.pkl', 'rb') as f:  # There is some test posts
-        posts = pkl.load(f)
+    posts = full_parser_list.parse_new()
 
     # overlap check. I will be useful in case of a scheduler misfire
     posts = [p for p in posts if p.url not in previous_post_urls]
