@@ -3,10 +3,7 @@ from bot.bot import bot
 from database import session, User, Channel, Post
 from parsers import full_parser_list
 from parsers.base_classes import ParserPost
-
-# temporary
-get_important_posts = lambda x: x  # mock function, it will be implemented in model package
-
+from model import get_important_posts
 
 NOTIFICATION_TEMPLATE = 'В канале <u><b>{0}</b></u> появилась важная информация:\n{1}'
 
