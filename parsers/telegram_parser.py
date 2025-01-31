@@ -2,6 +2,7 @@ import datetime
 from pyrogram import Client
 from pyrogram.types import Message
 from parsers.base_classes import AsyncAbstractParser, ParserPost
+from parsers.logger import logger
 
 
 class TelegramParser(AsyncAbstractParser):
@@ -23,6 +24,8 @@ class TelegramParser(AsyncAbstractParser):
         Parse posts from the channel determined by `self.channel`. self.MAX_POSTS posts will be returned.
         :return: List of posts parsed from the channel.
         """
+        logger.info("Parsing posts from Telegram channel %s", self.channel)
+
         async with Client("user_account") as user_client:
             posts = [post async for post in user_client.get_chat_history(self.channel, limit=self.MAX_POSTS)]
 
@@ -35,6 +38,8 @@ class TelegramParser(AsyncAbstractParser):
         :return: Filtered list of posts parsed from the channel.
         """
         since_datetime = datetime.datetime.now() - self.NEW_POSTS_TIME
+
+        logger.info("Parsing new posts from Telegram channel %s", self.channel)
 
         async with Client("user_account") as user_client:
             posts = [post async for post in user_client.get_chat_history(self.channel, limit=self.MAX_POSTS)

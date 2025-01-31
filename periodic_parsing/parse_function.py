@@ -4,6 +4,7 @@ from database import session, User, Channel, Post
 from parsers import full_parser_list
 from parsers.base_classes import ParserPost
 from model import get_important_posts
+from periodic_parsing.logger import logger
 
 NOTIFICATION_TEMPLATE = 'В канале <u><b>{0}</b></u> появилась важная информация:\n{1}'
 
@@ -31,6 +32,8 @@ async def run_tasks(tasks):
 
 def do_periodic_parsing():
     global previous_post_urls
+
+    logger.info('Periodic parsing has been started')
 
     posts = full_parser_list.parse_new()
 

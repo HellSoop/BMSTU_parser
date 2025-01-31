@@ -1,13 +1,17 @@
+import logging
 from transformers import pipeline
 from parsers.base_classes import ParserPost
 
+logger = logging.getLogger('model_logger')
 THRESHOLD = 0.5
 
+logger.info('Loading model...')
 pipe = pipeline(
     task='text-classification',
     model='HellSoop/BMSTU_parser_model',
     tokenizer='FacebookAI/xlm-roberta-base'
 )
+logger.info('Model loaded')
 
 
 def get_important_posts(posts: list[ParserPost], threshold: float = THRESHOLD) -> list[ParserPost]:

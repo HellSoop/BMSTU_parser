@@ -2,6 +2,7 @@ import os
 import datetime
 import requests
 from parsers.base_classes import AbstractParser, ParserPost
+from parsers.logger import logger
 
 TOKEN = os.getenv('VK_API_TOKEN')
 
@@ -38,6 +39,8 @@ class VKParser(AbstractParser):
         Parse posts from the page determined by `self.url`. self.MAX_POSTS posts will be returned.
         :return: List of posts parsed from the page.
         """
+        logger.info("Parsing VK posts in url %s", self.parse_url)
+
         response = requests.post(self.parse_url, headers={'Authorization': 'Bearer ' + TOKEN}).json()
         posts = [post for post in response['response']['items']]
 
@@ -50,6 +53,9 @@ class VKParser(AbstractParser):
         :return: Filtered list of posts parsed from the page.
         """
         since_datetime = (datetime.datetime.now() - self.NEW_POSTS_TIME).timestamp()
+
+        logger.info("Parsing new VK posts in url %s", self.parse_url)
+
         response = requests.post(self.parse_url, headers={'Authorization': 'Bearer ' + TOKEN}).json()
         posts = [post for post in response['response']['items'] if post['date'] >= since_datetime]
 
