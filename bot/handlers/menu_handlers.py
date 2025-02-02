@@ -12,8 +12,8 @@ async def startup_answer(msg: Message):
     await msg.delete()
     await msg.answer(START_TEMPLATE, parse_mode='HTML')
 
-    if not is_registered(msg.from_user.id):
-        register_user(msg.from_user.id)
+    if not await is_registered(msg.from_user.id):
+        await register_user(msg.from_user.id)
 
 
 @menu_router.message(Command('help'))
@@ -27,4 +27,4 @@ async def stop_answer(msg: Message):
     await msg.delete()
     await msg.answer(STOP_TEMPLATE, parse_mode='HTML')
 
-    unregister_user(msg.from_user.id)
+    await unregister_user(msg.from_user.id)

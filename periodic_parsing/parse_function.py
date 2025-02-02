@@ -1,21 +1,18 @@
 import asyncio
+from sqlalchemy import select
 from bot.bot import bot
-from database import session, User, Channel, Post
+from database import sync_session, User, Post
 from parsers import full_parser_list
 from parsers.base_classes import ParserPost
+from parsers.channels import channels_names
 from model import get_important_posts
 from periodic_parsing.logger import logger
 
 NOTIFICATION_TEMPLATE = 'В канале <u><b>{0}</b></u> появилась важная информация:\n{1}'
 
-s = session()
-
-channels = s.query(Channel).all()
-channels_names = {c.id: c.name for c in channels}
-previous_posts = s.query(Post).order_by(Post.date.desc()).limit(300).all()  # I suppose it will be enough
-previous_post_urls = {p.url for p in previous_posts}
-
-s.close()
+stmt = select(Post).order_by(Post.date.desc()).limit(300)
+with sync_session() as session:
+    previous_post_urls = {p.url for p in session.scalars(stmt).all()}  # I suppose it will be enough
 
 
 async def notify_user(user_id: int, post: ParserPost):
@@ -44,12 +41,13 @@ def do_periodic_parsing():
     important_posts = get_important_posts(posts)
 
     post_model_instances = [p.get_model_instance() for p in important_posts]
-    s = session()
-    s.add_all(post_model_instances)
-    s.commit()
 
-    user_ids = [u[0] for u in s.query(User.telegram_id).all()]
-    s.close()
+    # So, this will not work asynchronously, but it doesn't matter since it will run in parallel process
+    with sync_session() as session:
+        session.add_all(post_model_instances)
+        session.commit()
+        user_ids = session.scalars(select(User.id)).all()
+        user_ids = [u[0] for u in user_ids]
 
     tasks = [notify_user(uid, p) for p in important_posts for uid in user_ids]
     asyncio.run(run_tasks(tasks))
