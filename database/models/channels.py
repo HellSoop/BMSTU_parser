@@ -10,6 +10,7 @@ class Channel(Base):
     name = Column(String, unique=True, nullable=False)
 
     posts = relationship('Post', back_populates='channel', cascade='save-update, merge, delete')
+    subscribers = relationship('User', secondary='users_channels_association', back_populates='channels')
 
     def __repr__(self):
         return f'<Channel(id={self.id}, name={self.name})>'

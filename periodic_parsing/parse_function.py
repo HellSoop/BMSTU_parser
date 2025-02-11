@@ -1,26 +1,19 @@
 import asyncio
 from sqlalchemy import select
-from bot.bot import bot
-from database import sync_session, User, Post
+from sqlalchemy.orm import selectinload
+from database import sync_session, Post, Channel
 from parsers import full_parser_list
-from parsers.base_classes import ParserPost
 from parsers.channels import channels_names
 from model import get_important_posts
 from periodic_parsing.logger import logger
+from bot.utils.post_utils import send_post
+
 
 NOTIFICATION_TEMPLATE = 'В канале <u><b>{0}</b></u> появилась важная информация:\n{1}'
 
 stmt = select(Post).order_by(Post.date.desc()).limit(300)
 with sync_session() as session:
     previous_post_urls = {p.url for p in session.scalars(stmt).all()}  # I suppose it will be enough
-
-
-async def notify_user(user_id: int, post: ParserPost):
-    await bot.send_message(
-        user_id,
-        NOTIFICATION_TEMPLATE.format(channels_names[post.channel_id], post.url),
-        parse_mode='HTML',
-    )
 
 
 async def run_tasks(tasks):
@@ -46,8 +39,15 @@ def do_periodic_parsing():
     with sync_session() as session:
         session.add_all(post_model_instances)
         session.commit()
-        user_ids = session.scalars(select(User.id)).all()
-        user_ids = [u[0] for u in user_ids]
 
-    tasks = [notify_user(uid, p) for p in important_posts for uid in user_ids]
+        channel_posts = {cid: tuple(p for p in important_posts if p.channel_id == cid) for cid in channels_names}
+        tasks = []
+        for cid, channel_posts in channel_posts.items():
+            c = session.scalar(select(Channel).filter_by(id=cid).options(selectinload(Channel.subscribers)))
+            user_ids = [u.telegram_id for u in c.subscribers]
+
+            tasks.append(run_tasks([
+                send_post(uid, p.url, p.channel_id, notification=True) for p in channel_posts for uid in user_ids
+            ]))
+
     asyncio.run(run_tasks(tasks))

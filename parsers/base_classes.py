@@ -46,11 +46,11 @@ class AbstractParser(metaclass=ABCMeta):
         self.channel_id = channel_id
 
     @abstractmethod
-    def parse(self) -> list[ParserPost]:
+    def parse(self, *args, **kwargs) -> list[ParserPost]:
         pass
 
     @abstractmethod
-    def parse_new(self) -> list[ParserPost]:
+    def parse_new(self, *args, **kwargs) -> list[ParserPost]:
         pass
 
 
@@ -68,11 +68,11 @@ class AsyncAbstractParser(metaclass=ABCMeta):
         self.channel_id = channel_id
 
     @abstractmethod
-    async def parse(self) -> list[ParserPost]:
+    async def parse(self, *args, **kwargs) -> list[ParserPost]:
         pass
 
     @abstractmethod
-    async def parse_new(self) -> list[ParserPost]:
+    async def parse_new(self, *args, **kwargs) -> list[ParserPost]:
         pass
 
 
@@ -80,23 +80,21 @@ class ParserList:
     """
     Object that contains several parsers and simplifies working with them
     """
-    def __init__(self, *items: Union[AbstractParser, AsyncAbstractParser, "ParserList"],
-                 mode: Literal['new'] | Literal['union'] = 'new'):
+    def __init__(self, *items: Union[AbstractParser, AsyncAbstractParser, "ParserList"]):
         """
-        Creates the ParserList object depending on the selected mode
-        :param items: parsers (sync and async) or ParserList's depending on the mode
-        :param mode: 'new' to create the ParserList object from scratch or 'union' to merge multiple ParserList's
+        Creates the ParserList object
+        :param items: parsers (sync and async) or ParserList's
         """
-        match mode:
-            case 'new':
-                parsers = items
-            case 'union':
-                parsers = []
-                for plist in items:
-                    parsers.extend(plist.async_parsers)
-                    parsers.extend(plist.sync_parsers)
-            case _:
-                ValueError('mode must be either "new" or "union"')
+        parsers = []
+        self.parser_lists = []
+
+        for item in items:
+            if isinstance(item, ParserList):
+                self.parser_lists.append(item)
+            elif isinstance(item, AbstractParser) or isinstance(item, AsyncAbstractParser):
+                parsers.append(item)
+            else:
+                raise TypeError(f'Unsupported item type: {type(item)}')
 
         self.__sort_parsers(parsers)  # it will create self.sync_parsers and self.async_parsers
 
@@ -124,20 +122,32 @@ class ParserList:
         Use the parse() method from all parsers.
         :return: One-dimensional list of parsed posts
         """
+        res = []
+        for parser_list in self.parser_lists:
+            res.extend(parser_list.parse())
+
         async_tasks = [p.parse for p in self.async_parsers]
         sync_tasks = [p.parse for p in self.sync_parsers]
 
-        return asyncio.run(self._run_tasks_async(async_tasks, sync_tasks))
+        res.extend(asyncio.run(self._run_tasks_async(async_tasks, sync_tasks)))
+
+        return res
 
     def parse_new(self) -> list[ParserPost]:
         """
         Use the parse_new() method from all parsers.
         :return: One-dimensional list of parsed posts
         """
+        res = []
+        for parser_list in self.parser_lists:
+            res.extend(parser_list.parse_new())
+
         async_tasks = [p.parse_new for p in self.async_parsers]
         sync_tasks = [p.parse_new for p in self.sync_parsers]
 
-        return asyncio.run(self._run_tasks_async(async_tasks, sync_tasks))
+        res.extend(asyncio.run(self._run_tasks_async(async_tasks, sync_tasks)))
+
+        return res
 
     async def _run_tasks_async(self, async_tasks: list[Callable], sync_tasks: list[Callable]) -> list[Any]:
         """

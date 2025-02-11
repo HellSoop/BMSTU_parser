@@ -1,8 +1,10 @@
 from aiogram import Router
 from aiogram.types import Message
 from aiogram.filters.command import Command
+from aiogram_dialog import DialogManager, StartMode
 from bot.utils.user_utils import is_registered, register_user, unregister_user
 from bot.reply_templates.menu import START_TEMPLATE, HELP_TEMPLATE, STOP_TEMPLATE
+from bot.dialogs import HistoryDialogSG, SubscriptionsDialogSG
 
 menu_router = Router(name='menu')
 
@@ -28,3 +30,16 @@ async def stop_answer(msg: Message):
     await msg.answer(STOP_TEMPLATE, parse_mode='HTML')
 
     await unregister_user(msg.from_user.id)
+
+
+@menu_router.message(Command('history'))
+async def start_history_dialog(msg: Message, dialog_manager: DialogManager):
+    await msg.delete()
+    await dialog_manager.start(HistoryDialogSG.channel_select, mode=StartMode.RESET_STACK)
+
+
+@menu_router.message(Command('subscriptions'))
+async def start_subscriptions_dialog(msg: Message, dialog_manager: DialogManager):
+    await msg.delete()
+    if await is_registered(msg.from_user.id):
+        await dialog_manager.start(SubscriptionsDialogSG.main, mode=StartMode.RESET_STACK)

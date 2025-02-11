@@ -9,7 +9,7 @@ TOKEN = os.getenv('VK_API_TOKEN')
 
 class VKParser(AbstractParser):
     """Parses content from the VK group specified at creation"""
-    MAX_POSTS = 100  # maximum number of posts in one response provided by VK API
+    MAX_POSTS = 60  # optimal number of posts in one response
     # There is a planned overlap in case of a scheduler misfire
     NEW_POSTS_TIME = datetime.timedelta(hours=1, seconds=15)
 
@@ -42,7 +42,12 @@ class VKParser(AbstractParser):
         logger.info("Parsing VK posts in url %s", self.parse_url)
 
         response = requests.post(self.parse_url, headers={'Authorization': 'Bearer ' + TOKEN}).json()
-        posts = [post for post in response['response']['items']]
+        try:
+            posts = [post for post in response['response']['items']]
+        except KeyError:
+            logger.error("VK parsing filed for url=%s, got an error: %s", self.parse_url,
+                           response.get('error').get('error_msg'))
+            return []
 
         return self.process_posts(posts)
 
@@ -57,7 +62,12 @@ class VKParser(AbstractParser):
         logger.info("Parsing new VK posts in url %s", self.parse_url)
 
         response = requests.post(self.parse_url, headers={'Authorization': 'Bearer ' + TOKEN}).json()
-        posts = [post for post in response['response']['items'] if post['date'] >= since_datetime]
+        try:
+            posts = [post for post in response['response']['items'] if post['date'] >= since_datetime]
+        except KeyError:
+            logger.error("VK parsing filed for url: %s, got an error: %s", self.parse_url,
+                           response.get('error').get('error_msg'))
+            return []
 
         return self.process_posts(posts)
 

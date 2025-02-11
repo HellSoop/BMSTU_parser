@@ -10,14 +10,20 @@ logging.config.dictConfig(logging_config)
 
 import asyncio
 from aiogram import Dispatcher
+from aiogram.fsm.storage.memory import MemoryStorage
+from aiogram_dialog import setup_dialogs
 from periodic_parsing.scheduler import periodic_parsing_scheduler
 from bot.bot import bot
 from bot.handlers.menu_handlers import menu_router
+from bot.dialogs import dialogs_router
 
 logger = logging.getLogger('main')
 
-dp = Dispatcher()
+storage = MemoryStorage()
+dp = Dispatcher(storage=storage)
+setup_dialogs(dp)
 dp.include_routers(
+    dialogs_router,
     menu_router,
 )
 

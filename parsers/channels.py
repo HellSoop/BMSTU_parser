@@ -1,6 +1,6 @@
 from parsers.base_classes import ParserList
 from parsers.vk_parser import VKParser
-from parsers.telegram_parser import TelegramParser
+from parsers.telegram_parser import TelegramParser, TelegramParserList
 
 channels_names = {
     1: 'СНТО им. Н. Е. Жуковского',
@@ -41,7 +41,7 @@ channels_names = {
     36: 'Центр НТИ «Цифровое материаловедение» МГТУ им. Н.Э. Баумана',
 }
 
-full_parser_list = ParserList(
+vk_parser_list = ParserList(
     VKParser(1, domain='bmstu_snto'),
     VKParser(2, domain='ysc_bmstu_sm'),
     VKParser(3, domain='artclub.bmstu'),
@@ -72,10 +72,18 @@ full_parser_list = ParserList(
     VKParser(28, domain='vcbmstu'),
     VKParser(29, domain='baumankan'),
     VKParser(30, domain='wwbmstu'),
+)
+
+telegram_parser_list = TelegramParserList(
     TelegramParser(31, channel='studsovet_bmstu'),
     TelegramParser(32, channel='b2b_bmstu'),
     TelegramParser(33, channel='prof_bmstu'),
     TelegramParser(34, channel='student_rlm'),
     TelegramParser(35, channel='bmstu1830'),
     TelegramParser(36, channel='nti_bmstu'),
+)
+
+full_parser_list = ParserList(
+    vk_parser_list,
+    telegram_parser_list
 )
