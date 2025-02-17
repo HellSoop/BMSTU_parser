@@ -3,7 +3,7 @@ from aiogram.types import Message
 from aiogram.filters.command import Command
 from aiogram_dialog import DialogManager, StartMode
 from bot.utils.user_utils import is_registered, register_user, unregister_user
-from bot.reply_templates.menu import START_TEMPLATE, HELP_TEMPLATE, STOP_TEMPLATE
+from bot.reply_templates.menu import START_TEMPLATE, HELP_TEMPLATE, STOP_TEMPLATE, SUBSCRIPTIONS_NOT_REGISTERED_TEMPLATE
 from bot.dialogs import HistoryDialogSG, SubscriptionsDialogSG
 
 menu_router = Router(name='menu')
@@ -43,3 +43,5 @@ async def start_subscriptions_dialog(msg: Message, dialog_manager: DialogManager
     await msg.delete()
     if await is_registered(msg.from_user.id):
         await dialog_manager.start(SubscriptionsDialogSG.main, mode=StartMode.RESET_STACK)
+    else:
+        await msg.answer(SUBSCRIPTIONS_NOT_REGISTERED_TEMPLATE, parse_mode='HTML')
