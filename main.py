@@ -29,14 +29,14 @@ dp.include_routers(
 
 
 async def main():
-    try:
-        periodic_parsing_scheduler.start()
-        await dp.start_polling(bot)
-    except Exception as e:
-        logger.critical('Fatal error: %s', e, exc_info=True)
+    while True:
+        try:
+            periodic_parsing_scheduler.start()
+            await dp.start_polling(bot)
+        except Exception as e:
+            logger.critical('Fatal error: %s', e, exc_info=True)
 
 
 if __name__ == '__main__':
     logger.info('Bot started')
-    while True:
-        asyncio.run(main())
+    asyncio.run(main())
