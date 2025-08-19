@@ -7,7 +7,7 @@ from periodic_parsing.parse_function import do_periodic_parsing
 tz = timezone('Europe/Moscow')
 
 executors = {
-    'default': ProcessPoolExecutor()
+    'default': ProcessPoolExecutor(max_workers=1)
 }
 periodic_parsing_scheduler = AsyncIOScheduler(executors=executors, timezone=tz)
 
