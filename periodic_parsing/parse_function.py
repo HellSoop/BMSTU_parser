@@ -4,7 +4,6 @@ from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 from database import sync_session, Post, Channel
 from parsers import full_parser_list
-from parsers.channels import channels_names
 from periodic_parsing.logger import logger
 from bot.utils.post_utils import send_post
 
