@@ -3,10 +3,10 @@ from datetime import datetime, timedelta
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 from database import sync_session, Post, Channel
+from parsers import full_parser_list
+from parsers.channels import channels_names
 from periodic_parsing.logger import logger
 from bot.utils.post_utils import send_post
-
-NOTIFICATION_TEMPLATE = 'В канале <u><b>{0}</b></u> появилась важная информация:\n{1}'
 
 
 async def run_tasks(tasks):
@@ -18,9 +18,7 @@ def do_periodic_parsing():
     Performs the periodic parsing task, saves the results to database and sends notifications.
     :return: None
     """
-    # these imports should be there  to avoid loading useless data into the main process
-    from parsers import full_parser_list
-    from parsers.channels import channels_names
+    # these import should be there  to avoid loading useless data into the main process
     from model import get_important_posts
 
     logger.info('Periodic parsing has been started')
