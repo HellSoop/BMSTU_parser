@@ -22,30 +22,26 @@ def do_periodic_parsing():
     from model import get_important_posts
 
     logger.info('Periodic parsing has been started')
+    posts = full_parser_list.parse_new()
 
     # the interval is set to two hours to be completely sure that all duplicate posts will be in the set
     stmt = select(Post).filter(Post.date >= datetime.now() - timedelta(hours=2))
     with sync_session() as session:
         previous_post_urls = {p.url for p in session.scalars(stmt).all()}
 
-    posts = full_parser_list.parse_new()
+        # overlap check. I will be useful in case of a scheduler misfire
+        posts = [p for p in posts if p.url not in previous_post_urls]
+        logger.info('%d new posts was parsed', len(posts))
 
-    # overlap check. I will be useful in case of a scheduler misfire
-    posts = [p for p in posts if p.url not in previous_post_urls]
-    logger.info('%d new posts was parsed', len(posts))
+        important_posts = get_important_posts(posts)
 
-    important_posts = get_important_posts(posts)
-
-    post_model_instances = [p.get_model_instance() for p in important_posts]
-
-    # So, this will not work asynchronously, but it doesn't matter since it will run in parallel process
-    with sync_session() as session:
-        session.add_all(post_model_instances)
+        session.add_all([p.get_model_instance() for p in important_posts])
         session.commit()
 
         stmt = select(Channel).options(joinedload(Channel.subscribers))
         channels = session.scalars(stmt).unique().all()
 
+    # notify users
     channels = {c.id: c for c in channels}
     tasks = []
     for p in important_posts:
