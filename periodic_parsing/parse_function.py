@@ -1,7 +1,7 @@
 import asyncio
 from datetime import datetime, timedelta
 from sqlalchemy import select
-from sqlalchemy.orm import selectinload
+from sqlalchemy.orm import joinedload
 from database import sync_session, Post, Channel
 from parsers import full_parser_list
 from parsers.channels import channels_names
@@ -43,14 +43,13 @@ def do_periodic_parsing():
         session.add_all(post_model_instances)
         session.commit()
 
-        channel_posts = {cid: tuple(p for p in important_posts if p.channel_id == cid) for cid in channels_names}
-        tasks = []
-        for cid, channel_posts in channel_posts.items():
-            c = session.scalar(select(Channel).filter_by(id=cid).options(selectinload(Channel.subscribers)))
-            user_ids = [u.telegram_id for u in c.subscribers]
+        stmt = select(Channel).options(joinedload(Channel.subscribers))
+        channels = session.scalars(stmt).unique().all()
 
-            tasks.append(run_tasks([
-                send_post(uid, p.url, p.channel_id, notification=True) for p in channel_posts for uid in user_ids
-            ]))
+    channels = {c.id: c for c in channels}
+    tasks = []
+    for p in important_posts:
+        for u in channels[p.channel_id].subscribers:
+            tasks.append(send_post(u.telegram_id, p.url, p.channel_id, notification=True))
 
     asyncio.run(run_tasks(tasks))
