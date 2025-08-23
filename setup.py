@@ -52,7 +52,7 @@ def main():
     print('Creating "logs" directory...')
 
     try:
-        os.mkdir('pog')
+        os.mkdir('logs')
     except FileExistsError:  # if logs directory is already created for some reason we will use it
         pass
     except OSError:

@@ -15,13 +15,13 @@ for parsing VK. Bot is powered by [aiogram](https://aiogram.dev/).
 
     On Windows:
     ```shell
-    python3 -m venv venv
-    venv/Scripts/activate
+    python -m venv .venv
+    .venv/Scripts/activate
     ```
     On Linux / MacOS:
     ```shell
-    python3 -m venv venv
-    source venv/bin/activate
+    python3 -m venv .venv
+    source .venv/bin/activate
     ```
 
 2. **Install the requirements**
@@ -29,23 +29,15 @@ for parsing VK. Bot is powered by [aiogram](https://aiogram.dev/).
     pip3 install -r requirements.txt
     ```
 
-3. **Fill in the .env file**
-   1. **VK_API_TOKEN** as the name suggests, is used for requests to VK (needed for parsing). You can obtain your own token [here](https://id.vk.com/business/go)
-   2. **TG_USER_API_ID** and **TG_USER_API_HASH** are Telegram user account data required for parsing Telegram channels. You can obtain it [here](https://core.telegram.org/api/obtaining_api_id)
-   3. **BOT_TOKEN** is the authentication token received from [BotFather](https://t.me/BotFather). It's necessary for bot to operate.
-
-4. **Create a database**
-    
-    Run:
+3. **Run setup.py script**
+   
+   On Windows:
+   ```shell
+   python setup.py
+   ```
+    On Linux / MacOS:
     ```shell
-    alembic upgrade head 
-    ```
-
-5. **Login to the user's Telegram account**
-    
-    Run:
-    ```shell
-    python3 authorize_user_account.py
+    python3 setup.py
     ```
    And then fill in all the required fields
 
