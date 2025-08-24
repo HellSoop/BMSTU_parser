@@ -17,7 +17,7 @@ def main():
         raise RuntimeError('Wrong execution path')
 
     # fill .env file
-    with open('.env.tmp', 'w', encoding='utf-8'):
+    with open('.env', 'w', encoding='utf-8'):
         pass
 
     vk_api_token = getpass('Please enter your VK API token. You can obtain it from https://id.vk.com/business/go\n'
@@ -34,14 +34,15 @@ def main():
     set_key('.env', 'BOT_TOKEN', bot_token)
 
     # log into Telegram account
-    print('Trying to log into Telegram. Please note that you may need to enter your phone number and confirmation code.')
+    print('\n\nTrying to log into Telegram. '
+          'Please note that you may need to enter your phone number and confirmation code.')
 
     authorize_user_account()
 
     print('Telegram login successful')
 
     # make migrations
-    print('Applying database migrations...')
+    print('\n\nApplying database migrations...')
 
     result = subprocess.run(['alembic', 'upgrade', 'head'], stderr=subprocess.PIPE, text=True)
     if result.returncode != 0:
@@ -51,7 +52,7 @@ def main():
     print('Database migrations was applied successfully')
 
     # create logs directory
-    print('Creating "logs" directory...')
+    print('\n\nCreating "logs" directory...')
 
     try:
         os.mkdir('logs')
@@ -65,12 +66,15 @@ def main():
     print('"logs" directory was created')
 
     # download the model
-    print('Downloading model...')
+    print('\n\nDownloading model...')
 
     try:
         snapshot_download('HellSoop/BMSTU_parser_model')
-    except (OSError, RevisionNotFoundError, RepositoryNotFoundError):
-        print('Failed to download model')
+    except OSError:
+        print('Failed to download model. Please check your internet connection')
+        raise RuntimeError('Failed to download model')
+    except (RevisionNotFoundError, RepositoryNotFoundError):
+        print('Failed to download model. There is the error with the repository')
         raise RuntimeError('Failed to download model')
 
     print('Model was downloaded successfully')
@@ -82,4 +86,4 @@ if __name__ == '__main__':
             main()
             break
         except RuntimeError:
-            print('An error occurred. Please try again.')
+            print('\n\nAn error occurred. Please try again.')
