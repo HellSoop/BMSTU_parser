@@ -3,6 +3,8 @@ import subprocess
 from getpass import getpass
 from dotenv import set_key
 from authorize_user_account import main as authorize_user_account
+from huggingface_hub import snapshot_download
+from huggingface_hub.utils import RevisionNotFoundError, RepositoryNotFoundError
 
 
 def main():
@@ -12,7 +14,7 @@ def main():
     if os.getcwd() != path:
         print(f'Your current working directory interferes with the execution. Please run "cd {path}" '
               f'and try again.')
-        exit(1)
+        raise RuntimeError('Wrong execution path')
 
     # fill .env file
     with open('.env.tmp', 'w', encoding='utf-8'):
@@ -44,7 +46,7 @@ def main():
     result = subprocess.run(['alembic', 'upgrade', 'head'], stderr=subprocess.PIPE, text=True)
     if result.returncode != 0:
         print(f'Unable to apply database migrations.\nThere is an exception:\n{result.stderr}')
-        exit(1)
+        raise RuntimeError('Unable to apply database migrations')
 
     print('Database migrations was applied successfully')
 
@@ -58,10 +60,26 @@ def main():
     except OSError:
         print('Failed to create "logs" directory. Make sure you have permission to create "logs" directory '
               'or create it manually')
-        exit(1)
+        raise RuntimeError('Failed to create "logs" directory')
 
     print('"logs" directory was created')
 
+    # download the model
+    print('Downloading model...')
+
+    try:
+        snapshot_download('HellSoop/BMSTU_parser_model')
+    except (OSError, RevisionNotFoundError, RepositoryNotFoundError):
+        print('Failed to download model')
+        raise RuntimeError('Failed to download model')
+
+    print('Model was downloaded successfully')
+
 
 if __name__ == '__main__':
-    main()
+    while True:
+        try:
+            main()
+            break
+        except RuntimeError:
+            print('An error occurred. Please try again.')
