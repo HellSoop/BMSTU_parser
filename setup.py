@@ -51,19 +51,20 @@ def main():
 
     print('Database migrations was applied successfully')
 
+    # NOT NEEDED. Logs directory will be created during docker image building
     # create logs directory
-    print('\n\nCreating "logs" directory...')
-
-    try:
-        os.mkdir('logs')
-    except FileExistsError:  # if logs directory is already created for some reason we will use it
-        pass
-    except OSError:
-        print('Failed to create "logs" directory. Make sure you have permission to create "logs" directory '
-              'or create it manually')
-        raise RuntimeError('Failed to create "logs" directory')
-
-    print('"logs" directory was created')
+    # print('\n\nCreating "logs" directory...')
+    #
+    # try:
+    #     os.mkdir('logs')
+    # except FileExistsError:  # if logs directory is already created for some reason we will use it
+    #     pass
+    # except OSError:
+    #     print('Failed to create "logs" directory. Make sure you have permission to create "logs" directory '
+    #           'or create it manually')
+    #     raise RuntimeError('Failed to create "logs" directory')
+    #
+    # print('"logs" directory was created')
 
     # download the model
     print('\n\nDownloading model...')
