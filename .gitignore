@@ -5,6 +5,4 @@ venv/
 __pycache__/
 user_account.session
 */bot.session
-*/sources.txt
-*/bot.db
-logs/
+expose/
