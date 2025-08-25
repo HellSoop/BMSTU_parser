@@ -1,5 +1,5 @@
---extra-index-url https://download.pytorch.org/whl/cu126
-torch==2.8.0+cu126
+--extra-index-url https://download.pytorch.org/whl/cu129
+torch==2.8.0+cu129
 aiogram==3.21.0
 aiogram_dialog==2.4.0
 aiosqlite==0.21.0

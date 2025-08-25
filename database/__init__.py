@@ -4,10 +4,10 @@ from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from database.models import Channel, Post, User, Base, UserChannelAssociation
 
 # it will only work if you use it from main or another root package
-async_database_url = 'sqlite+aiosqlite:///database/bot.db'
+async_database_url = 'sqlite+aiosqlite:///expose/bot.db'
 async_engine = create_async_engine(async_database_url)
 async_session = async_sessionmaker(async_engine)
-sync_database_url = 'sqlite:///database/bot.db'
+sync_database_url = 'sqlite:///expose/bot.db'
 sync_engine = create_engine(sync_database_url)
 sync_session = sessionmaker(sync_engine)
 
